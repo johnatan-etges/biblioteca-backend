@@ -5,5 +5,7 @@
   "repository": "https://github.com/johnatan-etges/biblioteca-backend.git",
   "author": "Johnatan Matheus Etges <johnatan.etges@gmail.com>",
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+    "jest": "^28.1.0"
+  }
 }
