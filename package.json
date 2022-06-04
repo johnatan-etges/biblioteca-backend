@@ -4,6 +4,9 @@
   "main": "index.js",
   "repository": "https://github.com/johnatan-etges/biblioteca-backend.git",
   "author": "Johnatan Matheus Etges <johnatan.etges@gmail.com>",
+  "scripts": {
+    "test": "jest"
+  },
   "license": "MIT",
   "devDependencies": {
     "jest": "^28.1.0"
