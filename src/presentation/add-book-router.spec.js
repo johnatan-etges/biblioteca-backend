@@ -1,6 +1,6 @@
 class AddBookRouter {
   route(httpRequest) {
-    if (!httpRequest.body.title) {
+    if (!httpRequest.body.title || !httpRequest.body.publisher) {
       return {
         statusCode: 400
       }
@@ -15,6 +15,22 @@ describe('AddBookRouter', () => {
     const httpRequest = {
       body: {
         publisher: 'any publisher',
+        photo: 'any photo',
+        authors: ['any author']
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+  })
+
+  it('Should return 400 if no publisher is provided', () => {
+    const sut = new AddBookRouter()
+
+    const httpRequest = {
+      body: {
+        title: 'any title',
         photo: 'any photo',
         authors: ['any author']
       }
