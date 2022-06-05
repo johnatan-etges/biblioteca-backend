@@ -1,6 +1,7 @@
 class AddBookRouter {
   route(httpRequest) {
-    if (!httpRequest.body.title || !httpRequest.body.publisher || !httpRequest.body.photo || !httpRequest.body.authors) {
+    const { title, publisher, photo, authors } = httpRequest.body;
+    if (!title || !publisher || !photo || !authors) {
       return {
         statusCode: 400
       }
