@@ -1,48 +1,5 @@
-class AddBookRouter {
-  route(httpRequest) {
-    if (!httpRequest || !httpRequest.body) {
-      return HttpResponse.serverError()
-    }
-    const { title, publisher, photo, authors } = httpRequest.body;
-    if (!title) {
-      return HttpResponse.badRequest('title')
-    }
-
-    if (!publisher) {
-      return HttpResponse.badRequest('publisher')
-    }
-
-    if (!photo) {
-      return HttpResponse.badRequest('photo')
-    }
-
-    if (!authors) {
-      return HttpResponse.badRequest('authors')
-    }
-  }
-}
-
-class HttpResponse {
-  static badRequest(paramName) {
-    return {
-      statusCode: 400,
-      body: new MissingParamError(paramName)
-    }
-  }
-
-  static serverError() {
-    return {
-      statusCode: 500
-    }
-  }
-}
-
-class MissingParamError extends Error {
-  constructor(param) {
-    super(`Missing param: ${param}`)
-    this.name = 'MissingParamError'
-  }
-}
+const AddBookRouter = require('./add-book-router')
+const MissingParamError = require('../helpers/missing-param-error')
 
 describe('AddBookRouter', () => { 
   it('Should return 400 if no title is provided', () => {
@@ -83,7 +40,6 @@ describe('AddBookRouter', () => {
       }
     }
     const httpResponse = sut.route(httpRequest)
-
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('photo'))
   })
