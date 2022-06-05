@@ -1,6 +1,6 @@
 class AddBookRouter {
   route(httpRequest) {
-    if (!httpRequest.title) {
+    if (!httpRequest.body.title) {
       return {
         statusCode: 400
       }
