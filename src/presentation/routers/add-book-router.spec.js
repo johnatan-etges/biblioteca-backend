@@ -1,9 +1,13 @@
 const AddBookRouter = require('./add-book-router')
 const MissingParamError = require('../helpers/missing-param-error')
 
+const makeSut = () => {
+  return new AddBookRouter();
+}
+
 describe('AddBookRouter', () => { 
   it('Should return 400 if no title is provided', () => {
-    const sut = new AddBookRouter()
+    const sut = makeSut()
     const httpRequest = {
       body: {
         publisher: 'any publisher',
@@ -17,7 +21,7 @@ describe('AddBookRouter', () => {
   })
 
   it('Should return 400 if no publisher is provided', () => {
-    const sut = new AddBookRouter()
+    const sut = makeSut()
     const httpRequest = {
       body: {
         title: 'any title',
@@ -31,7 +35,7 @@ describe('AddBookRouter', () => {
   })
 
   it('Should return 400 if no photo is provided', () => {
-    const sut = new AddBookRouter()
+    const sut = makeSut()
     const httpRequest = {
       body: {
         title: 'any title',
@@ -45,7 +49,7 @@ describe('AddBookRouter', () => {
   })
 
   it('Should return 400 if no title is provided', () => {
-    const sut = new AddBookRouter()
+    const sut = makeSut()
     const httpRequest = {
       body: {
         title: 'any title',
@@ -59,13 +63,13 @@ describe('AddBookRouter', () => {
   })
 
   it('Should return 500 if no httpRequest is provided', () => {
-    const sut = new AddBookRouter()
+    const sut = makeSut()
     const httpResponse = sut.route()
     expect(httpResponse.statusCode).toBe(500)
   })
 
   it('Should return 500 if httpRequest has no body', () => {
-    const sut = new AddBookRouter()
+    const sut = makeSut()
     const httpRequest = {}
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
