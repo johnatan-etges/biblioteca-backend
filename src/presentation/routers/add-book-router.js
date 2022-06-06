@@ -6,35 +6,35 @@ module.exports = class AddBookRouter {
   }
 
   route(httpRequest) {
-    if (!httpRequest || !httpRequest.body || !this.createBookUseCase || !this.createBookUseCase.execute) {
+    try {
+      const { title, publisher, photo, authors } = httpRequest.body;
+      
+      if (!title) {
+        return HttpResponse.badRequest('title')
+      }
+
+      if (!publisher) {
+        return HttpResponse.badRequest('publisher')
+      }
+
+      if (!photo) {
+        return HttpResponse.badRequest('photo')
+      }
+
+      if (!authors) {
+        return HttpResponse.badRequest('authors')
+      }
+      
+      const created = this.createBookUseCase.execute(title, publisher, photo, authors)
+      
+      if (!created) {
+        return HttpResponse.resourceConflictError('book', title)
+      }
+
+      return HttpResponse.ok()
+    
+    } catch (error) {
       return HttpResponse.serverError()
     }
-    
-    const { title, publisher, photo, authors } = httpRequest.body;
-    
-    if (!title) {
-      return HttpResponse.badRequest('title')
-    }
-
-    if (!publisher) {
-      return HttpResponse.badRequest('publisher')
-    }
-
-    if (!photo) {
-      return HttpResponse.badRequest('photo')
-    }
-
-    if (!authors) {
-      return HttpResponse.badRequest('authors')
-    }
-    
-    const created = this.createBookUseCase.execute(title, publisher, photo, authors)
-    
-    if (!created) {
-      return HttpResponse.resourceConflictError('book', title)
-    }
-
-    return HttpResponse.ok()
   }
-
 }

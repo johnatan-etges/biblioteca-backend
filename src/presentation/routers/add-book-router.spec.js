@@ -1,6 +1,7 @@
 const AddBookRouter = require('./add-book-router')
 const MissingParamError = require('../helpers/missing-param-error')
 const ResourceConflictError = require('../helpers/resource-conflict-error')
+const ServerError = require('../helpers/server-error')
 
 const makeSut = () => {
 
@@ -87,6 +88,7 @@ describe('AddBookRouter', () => {
     const { sut } = makeSut()
     const httpResponse = sut.route()
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should return 500 if httpRequest has no body', () => {
@@ -94,6 +96,7 @@ describe('AddBookRouter', () => {
     const httpRequest = {}
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should call CreateBookUseCase with correct params', () => {
@@ -155,6 +158,7 @@ describe('AddBookRouter', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should return 500 if createBookUseCase has no execute method', () => {
@@ -171,5 +175,6 @@ describe('AddBookRouter', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
