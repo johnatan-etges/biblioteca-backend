@@ -6,11 +6,15 @@ const makeSut = () => {
 
   //mock
   class CreateBookUseCaseSpy {
+    created = true
+
     execute(title, publisher, photo, authors) {
       this.title = title
       this.publisher = publisher
       this.photo = photo
       this.authors = authors
+      
+      return this.created
     }
   }
   const createBookUseCaseSpy = new CreateBookUseCaseSpy()
@@ -109,15 +113,9 @@ describe('AddBookRouter', () => {
     expect(createBookUseCaseSpy.authors).toBe(httpRequest.body.authors)
   })
 
-  it('Should return 409 if book already exists', () => {
-    class CreateBookUseCaseSpy {
-      created = false
-      execute() {
-        return this.created
-      }
-    }
-    const createBookUseCase = new CreateBookUseCaseSpy()
-    const sut = new AddBookRouter(createBookUseCase)
+  it('Should return 409 if book already exists', () => {    
+    const { sut, createBookUseCaseSpy } = makeSut()
+    createBookUseCaseSpy.created = false
     const httpRequest = {
       body: {
         title: 'already existent title',
@@ -129,6 +127,20 @@ describe('AddBookRouter', () => {
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(409)
     expect(httpResponse.body).toEqual(new ResourceConflictError('book', httpRequest.body.title))
+  })  
+
+  it('Should return 200 if a book is created', () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        title: 'valid title',
+        publisher: 'valid publisher',
+        photo: 'valis photo',
+        authors: ['valis author']
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
   })
 
   it('Should return 500 if no createBookUseCase is provided', () => {
@@ -159,26 +171,5 @@ describe('AddBookRouter', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
-  })
-
-  it('Should return 200 if a book is created', () => {
-    class CreateBookUseCaseSpy {
-      created = true
-      execute() {
-        return this.created
-      }
-    }
-    const createBookUseCase = new CreateBookUseCaseSpy()
-    const sut = new AddBookRouter(createBookUseCase)
-    const httpRequest = {
-      body: {
-        title: 'valid title',
-        publisher: 'valid publisher',
-        photo: 'valis photo',
-        authors: ['valis author']
-      }
-    }
-    const httpResponse = sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(200)
   })
 })
