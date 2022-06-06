@@ -9,7 +9,9 @@ module.exports = class AddBookRouter {
     if (!httpRequest || !httpRequest.body || !this.createBookUseCase || !this.createBookUseCase.execute) {
       return HttpResponse.serverError()
     }
+    
     const { title, publisher, photo, authors } = httpRequest.body;
+    
     if (!title) {
       return HttpResponse.badRequest('title')
     }
@@ -25,10 +27,16 @@ module.exports = class AddBookRouter {
     if (!authors) {
       return HttpResponse.badRequest('authors')
     }
-
-    this.createBookUseCase.execute(title, publisher, photo, authors)
     
-    return HttpResponse.resourceConflictError('book', title)
+    const created = this.createBookUseCase.execute(title, publisher, photo, authors)
+    
+    if (!created) {
+      return HttpResponse.resourceConflictError('book', title)
+    }
+
+    return {
+      statusCode: 200
+    }
   }
 
 }

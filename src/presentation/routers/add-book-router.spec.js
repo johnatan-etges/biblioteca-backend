@@ -110,7 +110,14 @@ describe('AddBookRouter', () => {
   })
 
   it('Should return 409 if book already exists', () => {
-    const { sut } = makeSut()
+    class CreateBookUseCaseSpy {
+      created = false
+      execute() {
+        return this.created
+      }
+    }
+    const createBookUseCase = new CreateBookUseCaseSpy()
+    const sut = new AddBookRouter(createBookUseCase)
     const httpRequest = {
       body: {
         title: 'already existent title',
@@ -138,8 +145,6 @@ describe('AddBookRouter', () => {
     expect(httpResponse.statusCode).toBe(500)
   })
 
-
-
   it('Should return 500 if createBookUseCase has no execute method', () => {
     class CreateBookUseCaseSpy {}
     const createBookUseCaseSpy = new CreateBookUseCaseSpy();
@@ -154,5 +159,26 @@ describe('AddBookRouter', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+  })
+
+  it('Should return 200 if a book is created', () => {
+    class CreateBookUseCaseSpy {
+      created = true
+      execute() {
+        return this.created
+      }
+    }
+    const createBookUseCase = new CreateBookUseCaseSpy()
+    const sut = new AddBookRouter(createBookUseCase)
+    const httpRequest = {
+      body: {
+        title: 'valid title',
+        publisher: 'valid publisher',
+        photo: 'valis photo',
+        authors: ['valis author']
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
   })
 })
