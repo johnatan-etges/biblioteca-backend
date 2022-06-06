@@ -4,8 +4,26 @@ const ResourceConflictError = require('../helpers/resource-conflict-error')
 const ServerError = require('../helpers/server-error')
 
 const makeSut = () => {
+  const createBookUseCaseSpy = makeCreateBookUseCaseSpy()
+  const sut = new AddBookRouter(createBookUseCaseSpy)
 
-  //mock
+  return {
+    sut,
+    createBookUseCaseSpy
+  }
+}
+
+const makeCreateBookUseCaseSpyWithError = () => {
+  class CreateBookUseCaseSpy {
+    execute() {
+      throw new Error()
+    }
+  }
+
+  return new CreateBookUseCaseSpy()
+}
+
+const makeCreateBookUseCaseSpy = () => {
   class CreateBookUseCaseSpy {
     created = true
 
@@ -18,13 +36,8 @@ const makeSut = () => {
       return this.created
     }
   }
-  const createBookUseCaseSpy = new CreateBookUseCaseSpy()
-  const sut = new AddBookRouter(createBookUseCaseSpy)
 
-  return {
-    sut,
-    createBookUseCaseSpy
-  }
+  return new CreateBookUseCaseSpy()
 }
 
 describe('AddBookRouter', () => { 
@@ -177,16 +190,9 @@ describe('AddBookRouter', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
-  it('Should return 500 if createBookUseCase throws', () => {
-    class CreateBookUseCaseSpy {
-      created = true
-  
-      execute(title, publisher, photo, authors) {
-        throw new Error()
-      }
-    }
-    const createBookUseCaseSpy = new CreateBookUseCaseSpy()
-    const sut  = new AddBookRouter(createBookUseCaseSpy)
+  it('Should return 500 if createBookUseCase throws', () => {    
+    const createBookUseCaseSpyWithError = makeCreateBookUseCaseSpyWithError()
+    const sut = new AddBookRouter(createBookUseCaseSpyWithError)
     const httpRequest = {
       body: {
         title: 'any title',
