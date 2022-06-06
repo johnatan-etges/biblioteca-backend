@@ -177,4 +177,25 @@ describe('AddBookRouter', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
+  it('Should return 500 if createBookUseCase throws', () => {
+    class CreateBookUseCaseSpy {
+      created = true
+  
+      execute(title, publisher, photo, authors) {
+        throw new Error()
+      }
+    }
+    const createBookUseCaseSpy = new CreateBookUseCaseSpy()
+    const sut  = new AddBookRouter(createBookUseCaseSpy)
+    const httpRequest = {
+      body: {
+        title: 'any title',
+        publisher: 'any publisher',
+        photo: 'any photo',
+        authors: ['any author']
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+  })
 })
