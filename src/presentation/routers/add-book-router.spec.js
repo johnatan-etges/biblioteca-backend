@@ -1,5 +1,6 @@
 const AddBookRouter = require('./add-book-router')
 const MissingParamError = require('../helpers/missing-param-error')
+const ResourceConflictError = require('../helpers/resource-conflict-error')
 
 const makeSut = () => {
 
@@ -120,5 +121,6 @@ describe('AddBookRouter', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(409)
+    expect(httpResponse.body).toEqual(new ResourceConflictError('book', httpRequest.body.title))
   })
 })
