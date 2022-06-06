@@ -107,4 +107,18 @@ describe('AddBookRouter', () => {
     expect(createBookUseCaseSpy.photo).toBe(httpRequest.body.photo)
     expect(createBookUseCaseSpy.authors).toBe(httpRequest.body.authors)
   })
+
+  it('Should return 409 if book already exists', () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        title: 'already existent title',
+        publisher: 'any publisher',
+        photo: 'any photo',
+        authors: ['any author']
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(409)
+  })
 })

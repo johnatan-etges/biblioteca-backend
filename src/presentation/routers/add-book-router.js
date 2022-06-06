@@ -27,5 +27,10 @@ module.exports = class AddBookRouter {
     }
 
     this.createBookUseCase.execute(title, publisher, photo, authors)
+    
+    return {
+      statusCode: 409
+    }
   }
+
 }
