@@ -123,4 +123,36 @@ describe('AddBookRouter', () => {
     expect(httpResponse.statusCode).toBe(409)
     expect(httpResponse.body).toEqual(new ResourceConflictError('book', httpRequest.body.title))
   })
+
+  it('Should return 500 if no createBookUseCase is provided', () => {
+    const sut  = new AddBookRouter()
+    const httpRequest = {
+      body: {
+        title: 'any title',
+        publisher: 'any publisher',
+        photo: 'any photo',
+        authors: ['any author']
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+  })
+
+
+
+  it('Should return 500 if createBookUseCase has no execute method', () => {
+    class CreateBookUseCaseSpy {}
+    const createBookUseCaseSpy = new CreateBookUseCaseSpy();
+    const sut  = new AddBookRouter(createBookUseCaseSpy)
+    const httpRequest = {
+      body: {
+        title: 'any title',
+        publisher: 'any publisher',
+        photo: 'any photo',
+        authors: ['any author']
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+  })
 })

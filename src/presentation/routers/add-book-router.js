@@ -6,7 +6,7 @@ module.exports = class AddBookRouter {
   }
 
   route(httpRequest) {
-    if (!httpRequest || !httpRequest.body) {
+    if (!httpRequest || !httpRequest.body || !this.createBookUseCase || !this.createBookUseCase.execute) {
       return HttpResponse.serverError()
     }
     const { title, publisher, photo, authors } = httpRequest.body;
