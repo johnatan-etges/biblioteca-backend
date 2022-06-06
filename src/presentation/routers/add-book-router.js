@@ -34,9 +34,7 @@ module.exports = class AddBookRouter {
       return HttpResponse.resourceConflictError('book', title)
     }
 
-    return {
-      statusCode: 200
-    }
+    return HttpResponse.ok()
   }
 
 }
