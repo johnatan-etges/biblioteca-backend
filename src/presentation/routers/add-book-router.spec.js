@@ -27,7 +27,7 @@ const makeCreateBookUseCaseSpy = () => {
   class CreateBookUseCaseSpy {
     created = true
 
-    execute(title, publisher, photo, authors) {
+    async execute(title, publisher, photo, authors) {
       this.title = title
       this.publisher = publisher
       this.photo = photo
@@ -41,7 +41,7 @@ const makeCreateBookUseCaseSpy = () => {
 }
 
 describe('AddBookRouter', () => { 
-  it('Should return 400 if no title is provided', () => {
+  it('Should return 400 if no title is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -50,12 +50,12 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('title'))
   })
 
-  it('Should return 400 if no publisher is provided', () => {
+  it('Should return 400 if no publisher is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -64,12 +64,12 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('publisher'))
   })
 
-  it('Should return 400 if no photo is provided', () => {
+  it('Should return 400 if no photo is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -78,12 +78,12 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('photo'))
   })
 
-  it('Should return 400 if no title is provided', () => {
+  it('Should return 400 if no title is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -92,27 +92,27 @@ describe('AddBookRouter', () => {
         photo: 'any photo',
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('authors'))
   })
 
-  it('Should return 500 if no httpRequest is provided', () => {
+  it('Should return 500 if no httpRequest is provided', async () => {
     const { sut } = makeSut()
-    const httpResponse = sut.route()
+    const httpResponse = await sut.route()
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  it('Should return 500 if httpRequest has no body', () => {
+  it('Should return 500 if httpRequest has no body', async () => {
     const { sut } = makeSut()
     const httpRequest = {}
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  it('Should call CreateBookUseCase with correct params', () => {
+  it('Should call CreateBookUseCase with correct params', async () => {
     const { sut, createBookUseCaseSpy } = makeSut()
     const httpRequest = {
       body: {
@@ -129,7 +129,7 @@ describe('AddBookRouter', () => {
     expect(createBookUseCaseSpy.authors).toBe(httpRequest.body.authors)
   })
 
-  it('Should return 409 if book already exists', () => {    
+  it('Should return 409 if book already exists', async () => {    
     const { sut, createBookUseCaseSpy } = makeSut()
     createBookUseCaseSpy.created = false
     const httpRequest = {
@@ -140,12 +140,12 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(409)
     expect(httpResponse.body).toEqual(new ResourceConflictError('book', httpRequest.body.title))
   })  
 
-  it('Should return 200 if a book is created', () => {
+  it('Should return 200 if a book is created', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -155,11 +155,11 @@ describe('AddBookRouter', () => {
         authors: ['valis author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
   })
 
-  it('Should return 500 if no createBookUseCase is provided', () => {
+  it('Should return 500 if no createBookUseCase is provided', async () => {
     const sut  = new AddBookRouter()
     const httpRequest = {
       body: {
@@ -169,12 +169,12 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  it('Should return 500 if createBookUseCase has no execute method', () => {
+  it('Should return 500 if createBookUseCase has no execute method', async () => {
     class CreateBookUseCaseSpy {}
     const createBookUseCaseSpy = new CreateBookUseCaseSpy();
     const sut  = new AddBookRouter(createBookUseCaseSpy)
@@ -186,11 +186,11 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
-  it('Should return 500 if createBookUseCase throws', () => {    
+  it('Should return 500 if createBookUseCase throws', async () => {    
     const createBookUseCaseSpyWithError = makeCreateBookUseCaseSpyWithError()
     const sut = new AddBookRouter(createBookUseCaseSpyWithError)
     const httpRequest = {
@@ -201,7 +201,7 @@ describe('AddBookRouter', () => {
         authors: ['any author']
       }
     }
-    const httpResponse = sut.route(httpRequest)
+    const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
   })
 })

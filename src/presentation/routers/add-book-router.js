@@ -5,7 +5,7 @@ module.exports = class AddBookRouter {
     this.createBookUseCase = createBookUseCase
   }
 
-  route(httpRequest) {
+  async route(httpRequest) {
     try {
       const { title, publisher, photo, authors } = httpRequest.body;
       
@@ -25,7 +25,7 @@ module.exports = class AddBookRouter {
         return HttpResponse.badRequest('authors')
       }
       
-      const created = this.createBookUseCase.execute(title, publisher, photo, authors)
+      const created = await this.createBookUseCase.execute(title, publisher, photo, authors)
       
       if (!created) {
         return HttpResponse.resourceConflictError('book', title)
