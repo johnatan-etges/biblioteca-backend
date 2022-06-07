@@ -25,8 +25,6 @@ const makeCreateBookUseCaseSpyWithError = () => {
 
 const makeCreateBookUseCaseSpy = () => {
   class CreateBookUseCaseSpy {
-    created = true
-
     async execute(title, publisher, photo, authors) {
       this.title = title
       this.publisher = publisher
@@ -37,7 +35,10 @@ const makeCreateBookUseCaseSpy = () => {
     }
   }
 
-  return new CreateBookUseCaseSpy()
+  const createBookUseCaseSpy = new CreateBookUseCaseSpy()
+  createBookUseCaseSpy.created = true
+  
+  return createBookUseCaseSpy
 }
 
 describe('AddBookRouter', () => { 
