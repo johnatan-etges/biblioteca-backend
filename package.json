@@ -5,9 +5,10 @@
   "repository": "https://github.com/johnatan-etges/biblioteca-backend.git",
   "author": "Johnatan Matheus Etges <johnatan.etges@gmail.com>",
   "scripts": {
-    "test": "jest --watchAll --silent --noStackTrace",
-    "test:staged": "jest --passWithNoTests --findRelatedTests --silent --noStackTrace",
-    "test:ci": "jest --coverage --noStackTrace --silent"
+    "test": "jest --silent --noStackTrace --passWithNoTests --colors",
+    "test:unit": "npm test -- --watch",
+    "test:staged": "npm test -- --findRelatedTests",
+    "test:ci": "npm test -- --coverage"
   },
   "license": "MIT",
   "devDependencies": {
