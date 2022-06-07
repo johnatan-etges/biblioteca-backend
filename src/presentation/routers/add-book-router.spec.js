@@ -177,7 +177,7 @@ describe('AddBookRouter', () => {
 
   it('Should return 500 if createBookUseCase has no execute method', async () => {
     class CreateBookUseCaseSpy {}
-    const createBookUseCaseSpy = new CreateBookUseCaseSpy();
+    const createBookUseCaseSpy = {}
     const sut  = new AddBookRouter(createBookUseCaseSpy)
     const httpRequest = {
       body: {
