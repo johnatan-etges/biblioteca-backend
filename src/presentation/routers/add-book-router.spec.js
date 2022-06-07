@@ -83,7 +83,7 @@ describe('AddBookRouter', () => {
     expect(httpResponse.body).toEqual(new MissingParamError('photo'))
   })
 
-  it('Should return 400 if no title is provided', async () => {
+  it('Should return 400 if no author is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -129,7 +129,7 @@ describe('AddBookRouter', () => {
     expect(createBookUseCaseSpy.authors).toBe(httpRequest.body.authors)
   })
 
-  it('Should return 409 if book already exists', async () => {    
+  it('Should return 409 if book already exists', async () => {
     const { sut, createBookUseCaseSpy } = makeSut()
     createBookUseCaseSpy.created = false
     const httpRequest = {
@@ -190,7 +190,8 @@ describe('AddBookRouter', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
-  it('Should return 500 if createBookUseCase throws', async () => {    
+
+  it('Should return 500 if createBookUseCase throws', async () => {
     const createBookUseCaseSpyWithError = makeCreateBookUseCaseSpyWithError()
     const sut = new AddBookRouter(createBookUseCaseSpyWithError)
     const httpRequest = {
