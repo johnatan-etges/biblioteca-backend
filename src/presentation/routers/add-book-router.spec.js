@@ -160,7 +160,7 @@ describe('AddBookRouter', () => {
     expect(httpResponse.statusCode).toBe(200)
   })
 
-  it('Should return 500 if no createBookUseCase is provided', async () => {
+  it('Should return 500 if no CreateBookUseCase is provided', async () => {
     const sut  = new AddBookRouter()
     const httpRequest = {
       body: {
@@ -175,7 +175,7 @@ describe('AddBookRouter', () => {
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  it('Should return 500 if createBookUseCase has no execute method', async () => {
+  it('Should return 500 if CreateBookUseCase has no execute method', async () => {
     class CreateBookUseCaseSpy {}
     const createBookUseCaseSpy = {}
     const sut  = new AddBookRouter(createBookUseCaseSpy)
