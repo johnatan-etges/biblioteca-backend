@@ -6,7 +6,8 @@
   "author": "Johnatan Matheus Etges <johnatan.etges@gmail.com>",
   "scripts": {
     "test": "jest --watchAll --silent --noStackTrace",
-    "test:staged": "jest --passWithNoTests --findRelatedTests --silent --noStackTrace"
+    "test:staged": "jest --passWithNoTests --findRelatedTests --silent --noStackTrace",
+    "test:ci": "jest --coverage --noStackTrace --silent"
   },
   "license": "MIT",
   "devDependencies": {
