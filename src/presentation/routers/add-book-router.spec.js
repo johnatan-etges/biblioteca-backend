@@ -1,7 +1,6 @@
 const AddBookRouter = require('./add-book-router')
-const MissingParamError = require('../helpers/missing-param-error')
-const ResourceConflictError = require('../helpers/resource-conflict-error')
-const ServerError = require('../helpers/server-error')
+const { MissingParamError, ResourceConflictError } = require('../../shared/errors')
+const { ServerError } = require('../helpers/errors')
 
 const makeSut = () => {
   const createBookUseCaseSpy = makeCreateBookUseCaseSpy()

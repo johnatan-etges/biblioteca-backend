@@ -1,6 +1,5 @@
-const MissingParamError = require('./missing-param-error')
-const ResourceConflictError = require('./resource-conflict-error')
-const ServerError = require('./server-error')
+const { MissingParamError, ResourceConflictError } = require('../../shared/errors')
+const { ServerError } = require('./errors')
 
 module.exports = class HttpResponse {
   static badRequest(paramName) {
