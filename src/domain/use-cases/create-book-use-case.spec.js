@@ -26,10 +26,14 @@ class CreateBookUseCase{
     if (!this.findBookByTitleRepository.find) {
       throw new InvalidParamError('findBookByTitleRepository')
     }
+
+    this.findBookByTitleRepository.find(title)
   }
 }
 class FindBookByTitleRepositorySpy {
-
+  find(title) {
+    this.title = title
+  }
 }
 
 const makeSut = () => {
@@ -73,11 +77,18 @@ describe('CreateBookUseCase', () => {
     await expect(promisse).rejects.toEqual(new MissingParamError('findBookByTitleRepository'))
   })
 
-
   it('Should throw if FindBookByTitleRepository has no find method', async () => {
     const invalidFindBookByTitleRepository = {}
     const sut = new CreateBookUseCase(invalidFindBookByTitleRepository)
     const promisse = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
     await expect(promisse).rejects.toEqual(new InvalidParamError('findBookByTitleRepository'))
   })
+
+  it('Should call FindBookByTitleRepository with correct title', async () => {
+    const { sut, findBookByTitleRepositorySpy } = makeSut();
+    const title = 'any title'
+    await sut.execute(title, 'any publisher', 'any photo', ['any author'])
+    expect(findBookByTitleRepositorySpy.title).toBe(title)
+  })
+
 })
