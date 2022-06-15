@@ -27,12 +27,19 @@ class CreateBookUseCase{
       throw new InvalidParamError('findBookByTitleRepository')
     }
 
-    this.findBookByTitleRepository.find(title)
+    const bookId = this.findBookByTitleRepository.find(title)
+
+    if (bookId) {
+      this.created = false
+    }
+
+    return this.created
   }
 }
 class FindBookByTitleRepositorySpy {
   find(title) {
     this.title = title
+    return 'any book id'
   }
 }
 
@@ -89,6 +96,12 @@ describe('CreateBookUseCase', () => {
     const title = 'any title'
     await sut.execute(title, 'any publisher', 'any photo', ['any author'])
     expect(findBookByTitleRepositorySpy.title).toBe(title)
+  })
+
+  it('Should return false if the title already exists', async () => {
+    const { sut } = makeSut();
+    const created = await sut.execute('already existent title', 'any publisher', 'any photo', ['any author'])
+    expect(created).toBe(false)
   })
 
 })
