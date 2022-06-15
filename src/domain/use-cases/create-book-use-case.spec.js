@@ -30,21 +30,22 @@ class CreateBookUseCase{
     const bookId = this.findBookByTitleRepository.find(title)
 
     if (bookId) {
-      this.created = false
+      return false
     }
 
-    return this.created
+    return true
   }
 }
 class FindBookByTitleRepositorySpy {
   find(title) {
     this.title = title
-    return 'any book id'
+    return this.bookId
   }
 }
 
 const makeSut = () => {
   const findBookByTitleRepositorySpy = new FindBookByTitleRepositorySpy()
+  findBookByTitleRepositorySpy.bookId = 'any book id' 
   const sut = new CreateBookUseCase(findBookByTitleRepositorySpy)
   return {
     sut,
@@ -102,6 +103,13 @@ describe('CreateBookUseCase', () => {
     const { sut } = makeSut();
     const created = await sut.execute('already existent title', 'any publisher', 'any photo', ['any author'])
     expect(created).toBe(false)
+  })
+
+  it('Should return true if the title still does not exists', async () => {
+    const { sut, findBookByTitleRepositorySpy } = makeSut();
+    findBookByTitleRepositorySpy.bookId = null
+    const created = await sut.execute('still inexistent title', 'any publisher', 'any photo', ['any author'])
+    expect(created).toBe(true)
   })
 
 })
