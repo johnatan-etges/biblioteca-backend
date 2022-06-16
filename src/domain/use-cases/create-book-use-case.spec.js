@@ -2,7 +2,7 @@ const CreateBookUseCase = require('./create-book-use-case')
 const { MissingParamError, InvalidParamError, DepError } = require("../../shared/errors")
 
 const makeSut = () => {
-  const findBookByTitleRepositorySpy = makeFindBookByTitleRepository()
+  const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
   findBookByTitleRepositorySpy.bookId = 'any book id' 
   const addBookRepositorySpy = makeAddBookRepository()
   const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, addBookRepositorySpy)
@@ -13,7 +13,7 @@ const makeSut = () => {
   }
 }
 
-const makeFindBookByTitleRepository = () => {
+const makeFindBookByTitleRepositorySpy = () => {
   class FindBookByTitleRepositorySpy {
     find(title) {
       this.title = title
@@ -41,6 +41,16 @@ const makeAddBookRepository = () => {
       this.publisher = publisher
       this.photo = photo
       this.authors = authors
+    }
+  }
+
+  return new AddBookRepository()
+}
+
+const makeAddBookRepositorySpyWithError = () => {
+  class AddBookRepository {
+    add (title, publisher, photo, authors) {
+      throw new DepError('addBookRepository')
     }
   }
 
@@ -98,23 +108,24 @@ describe('CreateBookUseCase', () => {
     const created = await sut.execute('already existent title', 'any publisher', 'any photo', ['any author'])
     expect(created).toBe(false)
   })
- 
+
   it('Should throw if FindBookByTitleRepository throws', async () => {
     const findBookByTitleRepositorySpyWithError = makeFindBookByTitleRepositorySpyWithError()
-    const sut = new CreateBookUseCase(findBookByTitleRepositorySpyWithError);
+    const addBookRepositorySpy = makeAddBookRepository()
+    const sut = new CreateBookUseCase(findBookByTitleRepositorySpyWithError, addBookRepositorySpy)
     const promise = sut.execute('still inexistent title', 'any publisher', 'any photo', ['any author'])
     await expect(promise).rejects.toThrow(new DepError('findBookByTitleRepository'))
   })
-
+  
   it('Should throw if no AddBookRepository is provided', async () => {
-    const findBookByTitleRepositorySpy = makeFindBookByTitleRepository()
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
     const sut = new CreateBookUseCase(findBookByTitleRepositorySpy)
     const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
     await expect(promise).rejects.toThrow(new MissingParamError('addBookRepository'))
   })
 
   it('Should throw if no AddBookRepository is provided', async () => {
-    const findBookByTitleRepositorySpy = makeFindBookByTitleRepository()
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
     const invalidAddBookRepository = {}
     const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, invalidAddBookRepository)
     const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
@@ -137,4 +148,19 @@ describe('CreateBookUseCase', () => {
     expect(addBookRepositorySpy.authors).toEqual(this.authors)
   })
 
+  it('Should throw if AddBookRepository throws', async () => {
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
+    const addBookRepositorySpyWithError = makeAddBookRepositorySpyWithError()
+    const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, addBookRepositorySpyWithError)
+    const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
+    await expect(promise).rejects.toThrow(new DepError('addBookRepository'))
+  })
+
+  it('Should return true if a book is created', async () => {
+    const { sut, findBookByTitleRepositorySpy } = makeSut()
+    findBookByTitleRepositorySpy.bookId = null
+    const created = await sut.execute('any title,', 'any publisher', 'any photo', ['any author'])
+    expect(created).toBe(true)
+  })
+  
 })

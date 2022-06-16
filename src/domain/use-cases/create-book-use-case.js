@@ -28,15 +28,16 @@ module.exports = class CreateBookUseCase {
       throw new InvalidParamError('findBookByTitleRepository')
     }
 
-    const bookId = this.findBookByTitleRepository.find(title)
-
+    
     if (!this.addBookRepository) {
       throw new MissingParamError('addBookRepository')
     }
-
+    
     if (!this.addBookRepository.add) {
       throw new InvalidParamError('addBookRepository')
     }
+    
+    const bookId = this.findBookByTitleRepository.find(title)
 
     if (bookId) {
       return false
@@ -44,5 +45,6 @@ module.exports = class CreateBookUseCase {
 
     await this.addBookRepository.add(title, publisher, photo, authors)
 
+    return true
   }
 }
