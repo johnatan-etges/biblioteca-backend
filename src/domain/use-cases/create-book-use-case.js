@@ -32,7 +32,5 @@ module.exports = class CreateBookUseCase {
     if (bookId) {
       return false
     }
-
-    return true
   }
 }

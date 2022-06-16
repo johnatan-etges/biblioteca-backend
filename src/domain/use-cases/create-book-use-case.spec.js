@@ -83,19 +83,14 @@ describe('CreateBookUseCase', () => {
     const created = await sut.execute('already existent title', 'any publisher', 'any photo', ['any author'])
     expect(created).toBe(false)
   })
-
-  it('Should return true if the title still does not exists', async () => {
-    const { sut, findBookByTitleRepositorySpy } = makeSut();
-    findBookByTitleRepositorySpy.bookId = null
-    const created = await sut.execute('still inexistent title', 'any publisher', 'any photo', ['any author'])
-    expect(created).toBe(true)
-  })
-
+ 
   it('Should throw if FindBookByTitleRepository throws', async () => {
     const findBookByTitleRepositorySpyWithError = makeFindBookByTitleRepositorySpyWithError()
     const sut = new CreateBookUseCase(findBookByTitleRepositorySpyWithError);
     const promise = sut.execute('still inexistent title', 'any publisher', 'any photo', ['any author'])
     await expect(promise).rejects.toThrow(new DepError('findBookByTitleRepository'))
   })
+
+
 
 })
