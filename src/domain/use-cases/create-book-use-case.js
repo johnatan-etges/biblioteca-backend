@@ -6,7 +6,7 @@ module.exports = class CreateBookUseCase {
     this.addBookRepository = addBookRepository
   }
 
-  async execute(title, publisher, photo, authors) {    
+  async execute({ title, publisher, photo, authors }) {
     if (!title) {
       throw new MissingParamError('title')
     }
@@ -27,7 +27,6 @@ module.exports = class CreateBookUseCase {
     if (!this.findBookByTitleRepository.find) {
       throw new InvalidParamError('findBookByTitleRepository')
     }
-
     
     if (!this.addBookRepository) {
       throw new MissingParamError('addBookRepository')
