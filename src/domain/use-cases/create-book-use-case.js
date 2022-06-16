@@ -33,7 +33,11 @@ module.exports = class CreateBookUseCase {
     if (!this.addBookRepository) {
       throw new MissingParamError('addBookRepository')
     }
-    
+
+    if (!this.addBookRepository.add) {
+      throw new InvalidParamError('addBookRepository')
+    }
+
     if (bookId) {
       return false
     }

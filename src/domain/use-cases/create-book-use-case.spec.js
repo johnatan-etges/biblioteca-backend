@@ -35,7 +35,9 @@ const makeFindBookByTitleRepositorySpyWithError = () => {
 
 const makeAddBookRepository = () => {
   class AddBookRepository {
-
+    add () {
+      
+    }
   }
 
   return new AddBookRepository()
@@ -105,6 +107,14 @@ describe('CreateBookUseCase', () => {
     const sut = new CreateBookUseCase(findBookByTitleRepositorySpy)
     const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
     await expect(promise).rejects.toThrow(new MissingParamError('addBookRepository'))
+  })
+
+  it('Should throw if no AddBookRepository is provided', async () => {
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepository()
+    const invalidAddBookRepository = {}
+    const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, invalidAddBookRepository)
+    const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
+    await expect(promise).rejects.toThrow(new InvalidParamError('addBookRepository'))
   })
 
 })
