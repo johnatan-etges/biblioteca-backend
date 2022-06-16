@@ -42,5 +42,7 @@ module.exports = class CreateBookUseCase {
       return false
     }
 
+    await this.addBookRepository.add(title, publisher, photo, authors)
+
   }
 }

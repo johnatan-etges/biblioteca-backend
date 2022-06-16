@@ -8,7 +8,8 @@ const makeSut = () => {
   const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, addBookRepositorySpy)
   return {
     sut,
-    findBookByTitleRepositorySpy
+    findBookByTitleRepositorySpy,
+    addBookRepositorySpy
   }
 }
 
@@ -35,8 +36,11 @@ const makeFindBookByTitleRepositorySpyWithError = () => {
 
 const makeAddBookRepository = () => {
   class AddBookRepository {
-    add () {
-      
+    add (title, publisher, photo, authors) {
+      this.title = title
+      this.publisher = publisher
+      this.photo = photo
+      this.authors = authors
     }
   }
 
@@ -115,6 +119,22 @@ describe('CreateBookUseCase', () => {
     const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, invalidAddBookRepository)
     const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
     await expect(promise).rejects.toThrow(new InvalidParamError('addBookRepository'))
+  })
+
+  it('Should call AddBookRepository with correct params', async () => {
+    const { sut, findBookByTitleRepositorySpy, addBookRepositorySpy } = makeSut()
+    const title = 'any title'
+    const publisher = 'any publisher'
+    const photo = 'any photo'
+    const authors = ['any author']
+    
+    findBookByTitleRepositorySpy.created = null
+    await sut.execute(title, publisher, photo, authors)
+
+    expect(addBookRepositorySpy.title).toEqual(this.title)
+    expect(addBookRepositorySpy.publisher).toEqual(this.publisher)
+    expect(addBookRepositorySpy.photo).toEqual(this.photo)
+    expect(addBookRepositorySpy.authors).toEqual(this.authors)
   })
 
 })
