@@ -4,7 +4,8 @@ const { MissingParamError, InvalidParamError, DepError } = require("../../shared
 const makeSut = () => {
   const findBookByTitleRepositorySpy = makeFindBookByTitleRepository()
   findBookByTitleRepositorySpy.bookId = 'any book id' 
-  const sut = new CreateBookUseCase(findBookByTitleRepositorySpy)
+  const addBookRepositorySpy = makeAddBookRepository()
+  const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, addBookRepositorySpy)
   return {
     sut,
     findBookByTitleRepositorySpy
@@ -30,6 +31,14 @@ const makeFindBookByTitleRepositorySpyWithError = () => {
   }
 
   return new FindBookByTitleRepositorySpyWithError()
+}
+
+const makeAddBookRepository = () => {
+  class AddBookRepository {
+
+  }
+
+  return new AddBookRepository()
 }
 
 describe('CreateBookUseCase', () => { 
@@ -91,6 +100,11 @@ describe('CreateBookUseCase', () => {
     await expect(promise).rejects.toThrow(new DepError('findBookByTitleRepository'))
   })
 
-
+  it('Should throw if no AddBookRepository is provided', async () => {
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepository()
+    const sut = new CreateBookUseCase(findBookByTitleRepositorySpy)
+    const promise = sut.execute('any title', 'any publisher', 'any photo', ['any author'])
+    await expect(promise).rejects.toThrow(new MissingParamError('addBookRepository'))
+  })
 
 })
