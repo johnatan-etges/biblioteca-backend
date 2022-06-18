@@ -1,7 +1,7 @@
-const { MissingParamError, InvalidParamError, DepError } = require('../../shared/errors')
+const { MissingParamError, InvalidParamError } = require('../../shared/errors')
 
 module.exports = class CreateBookUseCase {
-  constructor(findBookByTitleRepository, addBookRepository) {
+  constructor({ findBookByTitleRepository, addBookRepository } = {}) {
     this.findBookByTitleRepository = findBookByTitleRepository
     this.addBookRepository = addBookRepository
   }
@@ -18,22 +18,6 @@ module.exports = class CreateBookUseCase {
     }
     if (!authors) {
       throw new MissingParamError('authors')
-    }
-
-    if (!this.findBookByTitleRepository) {
-      throw new MissingParamError('findBookByTitleRepository')
-    }
-
-    if (!this.findBookByTitleRepository.find) {
-      throw new InvalidParamError('findBookByTitleRepository')
-    }
-    
-    if (!this.addBookRepository) {
-      throw new MissingParamError('addBookRepository')
-    }
-    
-    if (!this.addBookRepository.add) {
-      throw new InvalidParamError('addBookRepository')
     }
     
     const bookId = this.findBookByTitleRepository.find(title)

@@ -1,5 +1,5 @@
 const CreateBookUseCase = require('./create-book-use-case')
-const { MissingParamError, InvalidParamError, DepError } = require("../../shared/errors")
+const { MissingParamError, InvalidParamError } = require("../../shared/errors")
 
 const params = {
   title: 'any title',
@@ -12,7 +12,10 @@ const makeSut = () => {
   const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
   findBookByTitleRepositorySpy.bookId = 'any book id' 
   const addBookRepositorySpy = makeAddBookRepository()
-  const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, addBookRepositorySpy)
+  const sut = new CreateBookUseCase({
+    findBookByTitleRepository: findBookByTitleRepositorySpy, 
+    addBookRepository: addBookRepositorySpy
+  })
   return {
     sut,
     findBookByTitleRepositorySpy,
@@ -34,7 +37,7 @@ const makeFindBookByTitleRepositorySpy = () => {
 const makeFindBookByTitleRepositorySpyWithError = () => {
   class FindBookByTitleRepositorySpyWithError{
     find(title) {
-      throw new DepError('findBookByTitleRepository')
+      throw new Error()
     }
   }
 
@@ -57,7 +60,7 @@ const makeAddBookRepository = () => {
 const makeAddBookRepositorySpyWithError = () => {
   class AddBookRepository {
     add (title, publisher, photo, authors) {
-      throw new DepError('addBookRepository')
+      throw new Error()
     }
   }
 
@@ -90,19 +93,6 @@ describe('CreateBookUseCase', () => {
     await expect(promise).rejects.toThrow(new MissingParamError('authors'))
   })
 
-  it('Should throw if no FindBookByTitleRepository is provided', async () => {
-    const sut = new CreateBookUseCase()
-    const promise = sut.execute(params)
-    await expect(promise).rejects.toThrow(new MissingParamError('findBookByTitleRepository'))
-  })
-
-  it('Should throw if FindBookByTitleRepository has no find method', async () => {
-    const invalidFindBookByTitleRepository = {}
-    const sut = new CreateBookUseCase(invalidFindBookByTitleRepository)
-    const promise = sut.execute(params)
-    await expect(promise).rejects.toThrow(new InvalidParamError('findBookByTitleRepository'))
-  })
-
   it('Should call FindBookByTitleRepository with correct title', async () => {
     const { sut, findBookByTitleRepositorySpy } = makeSut();
     await sut.execute(params)
@@ -115,29 +105,6 @@ describe('CreateBookUseCase', () => {
     expect(created).toBe(false)
   })
 
-  it('Should throw if FindBookByTitleRepository throws', async () => {
-    const findBookByTitleRepositorySpyWithError = makeFindBookByTitleRepositorySpyWithError()
-    const addBookRepositorySpy = makeAddBookRepository()
-    const sut = new CreateBookUseCase(findBookByTitleRepositorySpyWithError, addBookRepositorySpy)
-    const promise = sut.execute(params)
-    await expect(promise).rejects.toThrow(new DepError('findBookByTitleRepository'))
-  })
-  
-  it('Should throw if no AddBookRepository is provided', async () => {
-    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
-    const sut = new CreateBookUseCase(findBookByTitleRepositorySpy)
-    const promise = sut.execute(params)
-    await expect(promise).rejects.toThrow(new MissingParamError('addBookRepository'))
-  })
-
-  it('Should throw if AddBookRepository has no find method', async () => {
-    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
-    const invalidAddBookRepository = {}
-    const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, invalidAddBookRepository)
-    const promise = sut.execute(params)
-    await expect(promise).rejects.toThrow(new InvalidParamError('addBookRepository'))
-  })
-
   it('Should call AddBookRepository with correct params', async () => {
     const { sut, findBookByTitleRepositorySpy, addBookRepositorySpy } = makeSut()
     findBookByTitleRepositorySpy.bookId = null
@@ -148,19 +115,56 @@ describe('CreateBookUseCase', () => {
     expect(addBookRepositorySpy.authors).toEqual(params.authors)
   })
 
-  it('Should throw if AddBookRepository throws', async () => {
-    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
-    const addBookRepositorySpyWithError = makeAddBookRepositorySpyWithError()
-    const sut = new CreateBookUseCase(findBookByTitleRepositorySpy, addBookRepositorySpyWithError)
-    const promise = sut.execute(params)
-    await expect(promise).rejects.toThrow(new DepError('addBookRepository'))
-  })
-
   it('Should return true if a book is created', async () => {
     const { sut, findBookByTitleRepositorySpy } = makeSut()
     findBookByTitleRepositorySpy.bookId = null
     const created = await sut.execute(params)
     expect(created).toBe(true)
+  })
+
+  it('Should throw if invalid dependencies are provided', async () => {
+    const invalid = {}
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
+    const addBookRepositorySpy = makeAddBookRepository()
+    const suts = [].concat(
+      new CreateBookUseCase(),
+      new CreateBookUseCase({}),
+      new CreateBookUseCase({
+        addBookRepository: invalid
+      }),
+      new CreateBookUseCase({
+        addBookRepository: addBookRepositorySpy,
+      }),
+      new CreateBookUseCase({
+        addBookRepository: addBookRepositorySpy,
+        findBookByTitleRepository: invalid
+      })
+    )
+
+    for (const sut of suts) {
+      const promise = sut.execute(params)
+      await expect(promise).rejects.toThrow()
+    }
+  })
+
+  it('Should throw if any dependency throws', async () => {
+    const findBookByTitleRepositorySpy = makeFindBookByTitleRepositorySpy()
+    const addBookRepositorySpy = makeAddBookRepository()
+    const suts = [].concat(
+      new CreateBookUseCase({
+        addBookRepository: makeAddBookRepositorySpyWithError(),
+        findBookByTitleRepository: findBookByTitleRepositorySpy
+      }),
+      new CreateBookUseCase({
+        addBookRepository: addBookRepositorySpy,
+        findBookByTitleRepository: makeFindBookByTitleRepositorySpyWithError()
+      })
+    )
+    
+    for (const sut of suts) {
+      const promise = sut.execute(params)
+      await expect(promise).rejects.toThrow()
+    }
   })
   
 })
