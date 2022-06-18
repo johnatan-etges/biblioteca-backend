@@ -1,5 +1,5 @@
 const CreateBookUseCase = require('./create-book-use-case')
-const { MissingParamError, InvalidParamError } = require("../../shared/errors")
+const { MissingParamError } = require("../../shared/errors")
 
 const params = {
   title: 'any title',
